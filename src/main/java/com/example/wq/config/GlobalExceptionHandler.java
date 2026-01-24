@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 全局异常处理器 - 简化但完整
@@ -18,6 +19,21 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /**
+     * 忽略浏览器自动请求的资源（favicon.ico, Chrome DevTools 等）
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public void handleNoResourceFoundException(NoResourceFoundException e, HttpServletRequest request) {
+        // 静默忽略，不记录日志
+        String uri = request.getRequestURI();
+        if (!uri.contains("favicon.ico") &&
+            !uri.contains(".well-known") &&
+            !uri.contains("chrome.devtools")) {
+            log.warn("资源不存在: {}", uri);
+        }
+    }
 
     /**
      * 处理非法参数异常

@@ -19,6 +19,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // Knife4j静态资源映射
         registry.addResourceHandler("/doc.html")
                 .addResourceLocations("classpath:/META-INF/resources/");
+
+        // 忽略 favicon.ico 请求，避免日志错误
+        registry.addResourceHandler("/favicon.ico")
+                .addResourceLocations("classpath:/META-INF/resources/");
     }
 
     /**

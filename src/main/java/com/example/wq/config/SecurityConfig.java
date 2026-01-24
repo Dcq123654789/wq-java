@@ -1,12 +1,23 @@
 package com.example.wq.config;
 
+import com.example.wq.security.CustomUserDetailsService;
+import com.example.wq.security.JwtAuthenticationEntryPoint;
+import com.example.wq.security.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -15,19 +26,25 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Spring Security 配置 - 完全开放模式
+ * Spring Security 配置 - JWT 认证模式
  *
  * 特性：
- * 1. 允许所有接口访问（无需认证）
- * 2. 配置 CORS 跨域支持
- * 3. 禁用 CSRF（API 接口不需要）
- * 4. 防止常见 Web 攻击（XSS、帧劫持等）
- * 5. 支持后续扩展为认证模式
+ * 1. 放行登录接口和接口文档
+ * 2. 其他接口需要 JWT 认证
+ * 3. 配置 CORS 跨域支持
+ * 4. 禁用 CSRF（API 接口不需要）
+ * 5. 防止常见 Web 攻击（XSS、帧劫持等）
+ * 6. JWT 认证过滤器
  */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final CustomUserDetailsService customUserDetailsService;
 
     /**
      * 配置 HTTP 安全
@@ -41,9 +58,32 @@ public class SecurityConfig {
             // 配置 CORS
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
-            // 配置权限：允许所有请求
+            // 配置异常处理（401 未授权）
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            )
+
+            // 配置权限
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()  // 允许所有接口访问
+                // 放行登录相关接口
+                .requestMatchers("/api/auth/**").permitAll()
+
+                // 放行接口文档（Knife4j/Swagger）
+                .requestMatchers(
+                    "/doc.html",
+                    "/swagger-ui.html",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/swagger-resources/**",
+                    "/webjars/**",
+                    "/favicon.ico"
+                ).permitAll()
+
+                // 放行健康检查
+                .requestMatchers("/actuator/**").permitAll()
+
+                // 其他所有请求都需要认证
+                .anyRequest().authenticated()
             )
 
             // 禁用默认登录页面
@@ -52,10 +92,18 @@ public class SecurityConfig {
             // 禁用登出
             .logout(AbstractHttpConfigurer::disable)
 
+            // 添加 JWT 认证过滤器（在 UsernamePasswordAuthenticationFilter 之前）
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
             // 启用安全头（防止 XSS、点击劫持等）
+            // 注意：为支持Knife4j文档界面，放宽了CSP策略
             .headers(headers -> headers
                 .contentSecurityPolicy(csp -> csp
-                    .policyDirectives("default-src 'self'"))
+                    .policyDirectives("default-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                            "style-src 'self' 'unsafe-inline'; " +
+                            "img-src 'self' data:; " +
+                            "font-src 'self' data:;"))
                 .frameOptions(frame -> frame.sameOrigin())  // 防止点击劫持
                 .httpStrictTransportSecurity(hsts -> hsts  // 强制 HTTPS
                     .includeSubDomains(true)
@@ -65,6 +113,33 @@ public class SecurityConfig {
             );
 
         return http.build();
+    }
+
+    /**
+     * 密码编码器
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * 认证提供者
+     */
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+
+    /**
+     * 认证管理器
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     /**

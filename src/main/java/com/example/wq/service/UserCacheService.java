@@ -1,6 +1,6 @@
 package com.example.wq.service;
 
-import com.example.wq.entity.User;
+import com.example.wq.entity.WqUser;
 import com.example.wq.repository.EtlDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
@@ -31,10 +31,10 @@ public class UserCacheService {
         key = "'user:' + #id",
         unless = "#result == null"
     )
-    public User getUserById(String id) {
+    public WqUser getUserById(String id) {
         System.out.println("从数据库查询用户: " + id);
         // 模拟数据库查询
-        return (User) edao.findById(User.class, id);
+        return (WqUser) edao.findById(WqUser.class, id);
     }
 
     /**
@@ -45,7 +45,7 @@ public class UserCacheService {
         key = "'user:username:' + #username",
         unless = "#result == null"
     )
-    public User getUserByUsername(String username) {
+    public WqUser getUserByUsername(String username) {
         System.out.println("从数据库查询用户: " + username);
         // 实际应该通过 username 查询
         return null;
@@ -60,7 +60,7 @@ public class UserCacheService {
         cacheNames = "userCache",
         key = "'user:' + #user._id"
     )
-    public User updateUser(User user) {
+    public WqUser updateUser(WqUser user) {
         System.out.println("更新用户并刷新缓存: " + user.get_id());
         // 更新数据库
         edao.update(user);
@@ -80,7 +80,7 @@ public class UserCacheService {
     public void deleteUser(String id) {
         System.out.println("删除用户并清除缓存: " + id);
         // 删除数据库
-        edao.deleteById(User.class, id);
+        edao.deleteById(WqUser.class, id);
     }
 
     /**
@@ -100,10 +100,10 @@ public class UserCacheService {
      *
      * 插入操作通常不需要缓存，因为查询时会自动缓存
      */
-    public User createUser(Map<String, Object> userData) {
+    public WqUser createUser(Map<String, Object> userData) {
         System.out.println("创建新用户");
         // 创建用户
-        User user = new User();
+        WqUser user = new WqUser();
         // ... 设置属性
         return user;
     }
@@ -120,8 +120,8 @@ public class UserCacheService {
         condition = "#id != null && #id.length() > 0",  // id 不为空才执行方法
         unless = "#result == null || #result.status != 1"  // 只缓存状态正常的用户
     )
-    public User getActiveUser(String id) {
+    public WqUser getActiveUser(String id) {
         System.out.println("查询活跃用户: " + id);
-        return (User) edao.findById(User.class, id);
+        return (WqUser) edao.findById(WqUser.class, id);
     }
 }

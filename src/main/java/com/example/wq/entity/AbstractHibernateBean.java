@@ -34,6 +34,10 @@ public abstract class AbstractHibernateBean implements Serializable {
     @UpdateTimestamp
     private LocalDateTime updateTime;
 
+    @Schema(description = "状态：0-禁用 1-正常", example = "1")
+    @Column(name = "status")
+    private Integer status = 1;
+
     /**
      * 生成唯一ID
      */
