@@ -51,6 +51,10 @@ public class WqUser extends AbstractHibernateBean {
     @Column(name = "gender")
     private Integer gender = Gender.UNKNOWN.getCode();
 
+    @Schema(description = "出生日期", example = "1990-01-01")
+    @Column(name = "birth_date")
+    private java.time.LocalDate birthDate;
+
     @Schema(description = "省份", example = "广东省")
     @Column(name = "province", length = 50)
     private String province;
