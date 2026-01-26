@@ -113,6 +113,34 @@ public class HibernateUtils {
             } catch (Exception e) {
                 throw new IllegalArgumentException("无法解析日期时间: " + stringValue);
             }
+        } else if (targetType == java.time.LocalDate.class) {
+            // 支持日期格式转换
+            if (value instanceof java.time.LocalDate) {
+                return value;
+            }
+
+            // 尝试多种格式解析
+            String[] patterns = {
+                "yyyy-MM-dd",
+                "yyyy/MM/dd",
+                "yyyy年MM月dd日"
+            };
+
+            for (String pattern : patterns) {
+                try {
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                    return java.time.LocalDate.parse(stringValue, formatter);
+                } catch (Exception e) {
+                    // 继续尝试下一个格式
+                }
+            }
+
+            // 如果所有格式都失败，尝试 ISO 格式
+            try {
+                return java.time.LocalDate.parse(stringValue, DateTimeFormatter.ISO_LOCAL_DATE);
+            } catch (Exception e) {
+                throw new IllegalArgumentException("无法解析日期: " + stringValue);
+            }
         }
 
         return value;

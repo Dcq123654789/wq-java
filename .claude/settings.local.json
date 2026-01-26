@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(mvn clean compile:*)",
-      "Bash(mvn compile:*)"
+      "Bash(mvn compile:*)",
+      "Bash(./mvnw.cmd:*)",
+      "Bash(java:*)"
     ]
   }
 }

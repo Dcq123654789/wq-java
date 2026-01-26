@@ -2,6 +2,7 @@ package com.example.wq.entity;
 
 import com.example.wq.enums.DeletedFlag;
 import com.example.wq.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -52,6 +53,7 @@ public class WqUser extends AbstractHibernateBean {
     private Integer gender = Gender.UNKNOWN.getCode();
 
     @Schema(description = "出生日期", example = "1990-01-01")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "birth_date")
     private java.time.LocalDate birthDate;
 
