@@ -36,7 +36,7 @@ public class WxMiniappController {
      * 微信小程序一键登录
      */
     @PostMapping("/login")
-    @Operation(summary = "微信小程序登录", description = "通过微信code实现一键登录，返回JWT token")
+    @Operation(summary = "微信小程序登录", description = "通过微信code实现一键登录，返回JWT token和完整用户信息")
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
         description = "微信小程序登录请求参数<br><b>参数说明：</b><br>" +
                 "- <code>code</code>: 必填，微信小程序wx.login()获取的code<br>" +
@@ -68,7 +68,8 @@ public class WxMiniappController {
 
         Map<String, Object> response = wxMiniappService.login(code, nickname, avatar, gender);
 
-        log.info("用户登录成功: userId={}, nickname={}", response.get("userId"), response.get("nickname"));
+        WqUser user = (WqUser) response.get("user");
+        log.info("用户登录成功: userId={}, nickname={}", user.get_id(), user.getNickname());
 
         return Result.success("登录成功", response);
     }

@@ -68,15 +68,13 @@ public class WxMiniappService {
         String accessToken = jwtTokenUtil.generateAccessToken(user.get_id(), user.getOpenid());
         String refreshToken = jwtTokenUtil.generateRefreshToken(user.get_id(), user.getOpenid());
 
-        // 4. 构建响应
+        // 4. 构建响应（包含完整用户信息和token信息）
         Map<String, Object> result = new HashMap<>();
         result.put("accessToken", accessToken);
         result.put("refreshToken", refreshToken);
         result.put("tokenType", "Bearer");
         result.put("expiresIn", jwtProperties.getExpiration() / 1000);
-        result.put("userId", user.get_id());
-        result.put("nickname", user.getNickname());
-        result.put("avatar", user.getAvatar());
+        result.put("user", user);
         result.put("isNewUser", user.getCreateTime() != null &&
                            user.getCreateTime().isAfter(LocalDateTime.now().minusMinutes(1)));
 
