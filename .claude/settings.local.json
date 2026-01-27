@@ -4,7 +4,8 @@
       "Bash(mvn clean compile:*)",
       "Bash(mvn compile:*)",
       "Bash(./mvnw.cmd:*)",
-      "Bash(java:*)"
+      "Bash(java:*)",
+      "mcp__ide__getDiagnostics"
     ]
   }
 }

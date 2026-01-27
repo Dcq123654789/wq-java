@@ -93,39 +93,39 @@
 
     <!-- 开发环境配置 -->
     <springProfile name="dev,default">
-        <root level="INFO">
+        <root level="ERROR">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="ASYNC_FILE"/>
         </root>
 
         <!-- 应用日志 -->
-        <logger name="com.example.wq" level="DEBUG"/>
+        <logger name="com.example.wq" level="ERROR"/>
 
         <!-- SQL日志 -->
-        <logger name="org.springframework.boot.autoconfigure.logging" level="INFO"/>
-        <logger name="com.zaxxer.hikari" level="INFO"/>
+        <logger name="org.springframework.boot.autoconfigure.logging" level="ERROR"/>
+        <logger name="com.zaxxer.hikari" level="ERROR"/>
     </springProfile>
 
     <!-- 生产环境配置 -->
     <springProfile name="prod">
-        <root level="INFO">
+        <root level="ERROR">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE_INFO"/>
             <appender-ref ref="FILE_ERROR"/>
         </root>
 
         <!-- 应用日志 -->
-        <logger name="com.example.wq" level="INFO"/>
+        <logger name="com.example.wq" level="ERROR"/>
     </springProfile>
 
     <!-- 测试环境配置 -->
     <springProfile name="test">
-        <root level="INFO">
+        <root level="ERROR">
             <appender-ref ref="CONSOLE"/>
         </root>
 
         <!-- 应用日志 -->
-        <logger name="com.example.wq" level="DEBUG"/>
+        <logger name="com.example.wq" level="ERROR"/>
     </springProfile>
 
 </configuration>
