@@ -29,12 +29,13 @@ import java.util.List;
  * Spring Security 配置 - JWT 认证模式
  *
  * 特性：
- * 1. 放行登录接口和接口文档
- * 2. 其他接口需要 JWT 认证
- * 3. 配置 CORS 跨域支持
- * 4. 禁用 CSRF（API 接口不需要）
- * 5. 防止常见 Web 攻击（XSS、帧劫持等）
- * 6. JWT 认证过滤器
+ * 1. 放行用户端和管理端登录接口和接口文档
+ * 2. 支持两种Token类型：user（用户端）和admin（管理端）
+ * 3. 其他接口需要 JWT 认证
+ * 4. 配置 CORS 跨域支持
+ * 5. 禁用 CSRF（API 接口不需要）
+ * 6. 防止常见 Web 攻击（XSS、帧劫持等）
+ * 7. JWT 认证过滤器
  */
 @Configuration
 @EnableWebSecurity
@@ -65,9 +66,17 @@ public class SecurityConfig {
 
             // 配置权限
             .authorizeHttpRequests(auth -> auth
-                // 放行登录相关接口
+                // 放行用户端登录相关接口（微信小程序）
                 .requestMatchers("/api/auth/**").permitAll()
 
+                // 放行管理端登录相关接口（后台管理系统）
+                .requestMatchers("/api/admin/auth/**").permitAll()
+
+                // 放行批量操作接口
+                .requestMatchers("/api/batch/**").permitAll()
+
+                // 放行文件上传接口
+                .requestMatchers("/api/upload/**").permitAll()
                 // 放行接口文档（Knife4j/Swagger）
                 .requestMatchers(
                     "/doc.html",
@@ -81,6 +90,12 @@ public class SecurityConfig {
 
                 // 放行健康检查
                 .requestMatchers("/actuator/**").permitAll()
+
+                // 放行实体反射接口
+                .requestMatchers("/api/entity/**").permitAll()
+
+                // 放行通用CRUD接口
+                .requestMatchers("/api/crud/**").permitAll()
 
                 // 其他所有请求都需要认证
                 .anyRequest().authenticated()

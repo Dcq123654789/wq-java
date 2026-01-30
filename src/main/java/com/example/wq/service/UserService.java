@@ -1,11 +1,6 @@
 package com.example.wq.service;
 
-import com.example.wq.entity.AbstractHibernateBean;
-import com.example.wq.entity.Community;
-import com.example.wq.entity.HqlQuery;
-import com.example.wq.entity.PageResult;
-import com.example.wq.entity.Result;
-import com.example.wq.entity.WqUser;
+import com.example.wq.entity.*;
 import com.example.wq.repository.EtlDao;
 import com.example.wq.util.HibernateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +33,18 @@ public class UserService {
     private Map<String, Class<?>> entityMap = new HashMap<>();
 
     public UserService() {
-        // 初始化实体映射
+        // 初始化实体映射（统一使用小写）
         entityMap.put("user", WqUser.class);
         entityMap.put("wquser", WqUser.class);
         entityMap.put("community", Community.class);
+        entityMap.put("communityactivity", CommunityActivity.class);
+        entityMap.put("activityregistration", ActivityRegistration.class);
+        entityMap.put("adminuser", AdminUser.class);
         // 可以在这里添加更多实体映射
+
     }
 
+    
     /**
      * 获取实体类
      */

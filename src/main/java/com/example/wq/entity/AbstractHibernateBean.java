@@ -1,5 +1,6 @@
 package com.example.wq.entity;
 
+import com.example.wq.annotation.ExcludeField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @Data
 @Schema(description = "实体基础类")
+
 public abstract class AbstractHibernateBean implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -22,20 +24,24 @@ public abstract class AbstractHibernateBean implements Serializable {
     @Schema(description = "实体ID", example = "1703123456789_1234")
     @Id
     @Column(name = "_id")
+    @ExcludeField
     private String _id;
 
     @Schema(description = "创建时间", example = "2024-01-22 14:30:00")
     @Column(name = "create_time")
     @CreationTimestamp
+    @ExcludeField
     private LocalDateTime createTime;
 
     @Schema(description = "更新时间", example = "2024-01-22 14:30:00")
     @Column(name = "update_time")
     @UpdateTimestamp
+    @ExcludeField
     private LocalDateTime updateTime;
 
     @Schema(description = "状态：0-禁用 1-正常", example = "1")
     @Column(name = "status")
+    @ExcludeField
     private Integer status = 1;
 
     /**

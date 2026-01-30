@@ -1,5 +1,6 @@
 package com.example.wq.entity;
 
+import com.example.wq.annotation.ExcludeField;
 import com.example.wq.enums.DeletedFlag;
 import com.example.wq.enums.Gender;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -26,12 +27,9 @@ public class WqUser extends AbstractHibernateBean {
 
     @Schema(description = "微信UnionID", example = "ux1234567890abcdef")
     @Column(name = "unionid", length = 64)
-    private String unionid;
-
-    @Schema(description = "用户名", example = "zhangsan")
-    @Column(name = "username", length = 50)
-    private String username;
-
+    private String unionid; 
+ 
+        
     @Schema(description = "昵称", example = "张三")
     @Column(name = "nickname", length = 50)
     private String nickname;
@@ -77,6 +75,10 @@ public class WqUser extends AbstractHibernateBean {
     @Column(name = "community_id", length = 64)
     private String communityId;
 
+    @Schema(description = "所属社区名称", example = "COMM001")
+    @Column(name = "communityName", length = 64)
+    private String communityName;
+
     @Schema(description = "所属社区信息（懒加载）")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id", insertable = false, updatable = false)
@@ -85,7 +87,8 @@ public class WqUser extends AbstractHibernateBean {
     //    @Schema(description = "账户余额（分）", example = "10000")
     //    @Column(name = "balance", precision = 19, scale = 2)
     //    private Long balance = 0L;
-
+    
+    @ExcludeField
     @Schema(description = "逻辑删除", example = "0", allowableValues = {"0", "1"})
     @Column(name = "deleted")
     private Integer deleted = DeletedFlag.NOT_DELETED.getCode();
