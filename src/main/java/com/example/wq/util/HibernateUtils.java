@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
@@ -78,6 +79,12 @@ public class HibernateUtils {
                 return value;
             }
             return Float.parseFloat(stringValue);
+        } else if (targetType == BigDecimal.class) {
+            if (value instanceof BigDecimal) {
+                return value;
+            }
+            // 支持从字符串、整数、浮点数等类型转换
+            return new BigDecimal(stringValue);
         } else if (targetType == Boolean.class || targetType == boolean.class) {
             if (value instanceof Boolean) {
                 return value;
@@ -92,7 +99,9 @@ public class HibernateUtils {
             // 尝试多种格式解析
             String[] patterns = {
                 "yyyy-MM-dd HH:mm:ss",
+                "yyyy-MM-dd HH:mm",
                 "yyyy-MM-dd'T'HH:mm:ss",
+                "yyyy-MM-dd'T'HH:mm",
                 "yyyy-MM-dd HH:mm:ss.S",
                 "yyyy-MM-dd'T'HH:mm:ss.S",
                 "yyyy-MM-dd"

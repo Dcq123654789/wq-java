@@ -36,7 +36,7 @@ public class CommunityActivity extends AbstractHibernateBean {
 
     @Schema(description = "封面图片URL", example = "https://example.com/image.jpg")
     @Column(name = "cover_image", length = 500)
-    private String coverImage;
+    private List<String>  coverImage;
 
     @Schema(description = "活动描述", example = "邀请社区书法爱好者共同交流学习...")
     @Column(name = "description", columnDefinition = "TEXT")
@@ -113,7 +113,7 @@ public class CommunityActivity extends AbstractHibernateBean {
     @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price = BigDecimal.ZERO;
 
-    @ExcludeField
+
     @Schema(description = "社区ID（多社区场景）", example = "COMM001")
     @Column(name = "community_id", length = 64)
     private String communityId;
@@ -142,7 +142,8 @@ public class CommunityActivity extends AbstractHibernateBean {
     @Column(name = "audit_remark", length = 500)
     private String auditRemark;
 
-    // ========== 关联关系 ========== 
+    // ========== 关联关系 ==========
+    @ExcludeField
     @Schema(description = "所属社区信息（懒加载）")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id", insertable = false, updatable = false)
