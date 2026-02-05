@@ -1,5 +1,6 @@
 package com.example.wq.entity;
 
+import com.example.wq.annotation.ExcludeField;
 import com.example.wq.enums.PaymentStatus;
 import com.example.wq.enums.RegistrationStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -32,13 +33,9 @@ public class ActivityRegistration extends AbstractHibernateBean {
     @Column(name = "user_id", length = 64, nullable = false)
     private String userId;
 
-    @Schema(description = "用户姓名（冗余）", example = "张阿姨")
+    @Schema(description = "用户姓名", example = "张阿姨")
     @Column(name = "user_name", length = 100, nullable = false)
     private String userName;
-
-    @Schema(description = "用户头像（冗余）", example = "https://example.com/avatar1.jpg")
-    @Column(name = "user_avatar", length = 500)
-    private String userAvatar;
 
     @Schema(description = "联系电话", example = "139****1234")
     @Column(name = "user_phone", length = 20)
@@ -80,15 +77,26 @@ public class ActivityRegistration extends AbstractHibernateBean {
     @Column(name = "cancel_reason", length = 500)
     private String cancelReason;
 
+    @Schema(description = "订单号", example = "ACT1705321234567890ABC123")
+    @Column(name = "order_no", length = 64, unique = true)
+    private String orderNo;
+
+    @Schema(description = "支付过期时间", example = "2024-01-15 10:46:00")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @Column(name = "payment_expire_time")
+    private LocalDateTime paymentExpireTime;
+
     // ========== 关联关系 ==========
 
     @Schema(description = "关联的活动（懒加载）")
     @ManyToOne(fetch = FetchType.LAZY)
+    @ExcludeField
     @JoinColumn(name = "activity_id", insertable = false, updatable = false)
     private CommunityActivity activity;
 
     @Schema(description = "关联的用户（懒加载）")
     @ManyToOne(fetch = FetchType.LAZY)
+    @ExcludeField
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private WqUser user;
 
