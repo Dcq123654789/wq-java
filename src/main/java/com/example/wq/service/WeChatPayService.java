@@ -203,6 +203,7 @@ public class WeChatPayService {
 
     /**
      * 取消未支付的订单（释放名额）
+     * 优化版：使用原子操作避免N+1查询
      *
      * @param registrationId 报名记录ID
      * @param orderNo        订单号
@@ -219,19 +220,26 @@ public class WeChatPayService {
             throw new RuntimeException("订单状态不允许取消");
         }
 
+        // 查询活动（获取当前人数用于CAS操作）
+        CommunityActivity activity = activityRepository.findById(registration.getActivityId())
+                .orElseThrow(() -> new RuntimeException("活动不存在"));
+
+        // 原子减少活动参与人数
+        int updatedRows = activityRepository.decrementParticipantsAtomically(
+                registration.getActivityId(),
+                activity.getCurrentParticipants()
+        );
+
+        if (updatedRows == 0) {
+            // CAS失败
+            log.warn("减少活动名额失败，活动信息已变更: activityId={}", registration.getActivityId());
+        }
+
         // 更新报名状态为已取消
         registration.setStatus(1); // 1=已取消
         registration.setCancelTime(LocalDateTime.now());
         registration.setCancelReason("支付超时，订单自动取消");
         registrationRepository.save(registration);
-
-        // 减少活动参与人数
-        activityRepository.findById(registration.getActivityId()).ifPresent(activity -> {
-            if (activity.getCurrentParticipants() > 0) {
-                activity.setCurrentParticipants(activity.getCurrentParticipants() - 1);
-                activityRepository.save(activity);
-            }
-        });
 
         log.info("订单取消成功: orderNo={}", orderNo);
     }

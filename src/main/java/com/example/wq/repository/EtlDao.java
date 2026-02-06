@@ -16,9 +16,10 @@ import java.util.Map;
 
 /**
  * 数据访问对象
+ *
+ * 注意：DAO层不应该管理事务，事务由业务服务层统一管理
  */
 @Repository
-@Transactional
 public class EtlDao {
 
     @Autowired

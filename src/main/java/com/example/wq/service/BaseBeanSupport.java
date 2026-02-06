@@ -8,9 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 基础Bean支持服务 - 提供标准化的CRUD操作
+ *
+ * 注意：此类不使用类级别事务，具体方法根据需要在调用层添加事务
  */
 @Service
-@Transactional
 public class BaseBeanSupport {
 
     @Autowired

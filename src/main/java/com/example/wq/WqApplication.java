@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-public class WqApplication {
+public class 	WqApplication {
 
 	public static void main(String[] args) {
 		// 加载.env文件

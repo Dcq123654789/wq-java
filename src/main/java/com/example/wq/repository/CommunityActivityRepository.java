@@ -111,4 +111,23 @@ public interface CommunityActivityRepository extends JpaRepository<CommunityActi
             @Param("activityId") String activityId,
             @Param("deleted") Integer deleted
     );
+
+    /**
+     * 原子减少名额（条件更新）
+     * 只有当当前人数大于0时才更新成功
+     *
+     * @param activityId 活动ID
+     * @param currentParticipants 当前参与人数（用于 CAS 检查）
+     * @return 更新的记录数（1 表示成功，0 表示失败）
+     */
+    @Modifying
+    @Query("UPDATE CommunityActivity a " +
+            "SET a.currentParticipants = a.currentParticipants - 1 " +
+            "WHERE a._id = :activityId " +
+            "AND a.currentParticipants = :currentParticipants " +
+            "AND a.currentParticipants > 0")
+    int decrementParticipantsAtomically(
+            @Param("activityId") String activityId,
+            @Param("currentParticipants") Integer currentParticipants
+    );
 }

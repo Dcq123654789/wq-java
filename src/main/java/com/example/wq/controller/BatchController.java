@@ -41,8 +41,7 @@ public class BatchController {
                    "- <code>entity</code>: 必填，实体名称(如: wquser)<br>" +
                    "- <code>action</code>: 必填，操作类型(create/query/update/delete)<br><br>" +
                    "<b>请求示例：</b><br>" +
-                   "查询：{&quot;entity&quot;:&quot;wquser&quot;,&quot;action&quot;:&quot;query&quot;,&quot;pageNum&quot;:1,&quot;pageSize&quot;:10}<br>" +
-                   "创建：{&quot;entity&quot;:&quot;wquser&quot;,&quot;action&quot;:&quot;create&quot;,&quot;data&quot;:{&quot;nickname&quot;:&quot;张三&quot;}}"
+                   "查询：{&quot;entity&quot;:&quot;wquser&quot;,&quot;action&quot;:&quot;query&quot;,&quot;pageNum&quot;:1,&quot;pageSize&quot;:10}"
     )
     @io.swagger.v3.oas.annotations.parameters.RequestBody(
         description = "通用CRUD请求参数，在下方编辑JSON格式的请求体",
@@ -166,4 +165,5 @@ public class BatchController {
         }
         return userService.deleteByEntityName(entity, id);
     }
+
 }

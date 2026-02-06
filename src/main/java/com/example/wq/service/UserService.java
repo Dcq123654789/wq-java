@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.lang.reflect.Field;
 import java.util.*;
@@ -40,6 +41,11 @@ public class UserService {
         entityMap.put("communityactivity", CommunityActivity.class);
         entityMap.put("activityregistration", ActivityRegistration.class);
         entityMap.put("adminuser", AdminUser.class);
+        entityMap.put("review", Review.class);  
+        entityMap.put("order", Order.class); 
+        entityMap.put("product", Product.class);
+        entityMap.put("useraddress", UserAddress.class); 
+
         // 可以在这里添加更多实体映射
 
     }
@@ -60,6 +66,7 @@ public class UserService {
      * 创建实体
      */
     @SuppressWarnings("unchecked")
+    @Transactional(rollbackFor = Exception.class)
     public Result<?> createByEntityName(String entityName, Map<String, Object> data) {
         try {
             Class<AbstractHibernateBean> entityClass = (Class<AbstractHibernateBean>) getEntityClass(entityName);
@@ -112,6 +119,7 @@ public class UserService {
      * 更新实体
      */
     @SuppressWarnings("unchecked")
+    @Transactional(rollbackFor = Exception.class)
     public Result<?> updateByEntityName(String entityName, String id, Map<String, Object> data) {
         try {
             Class<AbstractHibernateBean> entityClass = (Class<AbstractHibernateBean>) getEntityClass(entityName);
@@ -148,6 +156,7 @@ public class UserService {
      * 删除实体
      */
     @SuppressWarnings("unchecked")
+    @Transactional(rollbackFor = Exception.class)
     public Result<?> deleteByEntityName(String entityName, String id) {
         try {
             Class<AbstractHibernateBean> entityClass = (Class<AbstractHibernateBean>) getEntityClass(entityName);

@@ -9,6 +9,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.ArrayList;
+import java.util.List;
+
 // import java.math.BigDecimal;
 
 /**
@@ -83,6 +86,10 @@ public class WqUser extends AbstractHibernateBean {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "community_id", insertable = false, updatable = false)
     private Community community;
+
+    @Schema(description = "用户收货地址列表（懒加载）")
+    @OneToMany(mappedBy = "wquser", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<UserAddress> addresses = new ArrayList<>();
 
     //    @Schema(description = "账户余额（分）", example = "10000")
     //    @Column(name = "balance", precision = 19, scale = 2)

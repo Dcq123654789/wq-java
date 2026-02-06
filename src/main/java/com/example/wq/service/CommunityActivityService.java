@@ -159,7 +159,7 @@ public class CommunityActivityService {
     }
 
     /**
-     * 取消报名
+     * 取消报名（优化版：使用原子操作避免N+1查询）
      *
      * @param activityId 活动ID
      * @param userId     用户ID
@@ -169,29 +169,35 @@ public class CommunityActivityService {
     public void cancelRegistration(String activityId, String userId, String cancelReason) {
         log.info("用户取消报名: activityId={}, userId={}", activityId, userId);
 
-        // 1. 查找报名记录
+        // 第一步：查询活动（获取当前人数用于CAS操作）
+        CommunityActivity activity = activityRepository.findById(activityId)
+                .orElseThrow(() -> new RuntimeException("活动不存在"));
+
+        // 第二步：查找报名记录
         ActivityRegistration registration = registrationRepository.findByActivityIdAndUserId(activityId, userId)
                 .orElseThrow(() -> new RuntimeException("未找到报名记录"));
 
-        // 2. 检查报名状态（只有已报名状态才能取消）
+        // 第三步：检查报名状态（只有已报名状态才能取消）
         if (registration.getStatus() != 0) {
             throw new RuntimeException("当前状态不能取消报名");
         }
 
-        // 3. 更新报名状态
+        // 第四步：原子减少活动参与人数（使用 CAS 机制避免并发问题）
+        int updatedRows = activityRepository.decrementParticipantsAtomically(
+                activityId,
+                activity.getCurrentParticipants()
+        );
+
+        if (updatedRows == 0) {
+            // CAS失败，人数在检查和更新之间发生了变化
+            throw new RuntimeException("取消失败，活动信息已变更，请刷新后重试");
+        }
+
+        // 第五步：更新报名状态
         registration.setStatus(1); // 1=已取消
         registration.setCancelTime(java.time.LocalDateTime.now());
         registration.setCancelReason(cancelReason);
         registrationRepository.save(registration);
-
-        // 4. 减少活动参与人数
-        CommunityActivity activity = activityRepository.findById(activityId)
-                .orElseThrow(() -> new RuntimeException("活动不存在"));
-
-        if (activity.getCurrentParticipants() > 0) {
-            activity.setCurrentParticipants(activity.getCurrentParticipants() - 1);
-            activityRepository.save(activity);
-        }
 
         log.info("取消报名成功: activityId={}, userId={}", activityId, userId);
     }

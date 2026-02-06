@@ -6,7 +6,10 @@
       "Bash(./mvnw.cmd:*)",
       "Bash(java:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(where mvn:*)"
+      "Bash(where mvn:*)",
+      "Bash(xargs:*)",
+      "Bash(find:*)",
+      "Bash(sort:*)"
     ]
   }
 }
